@@ -150,13 +150,15 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-## Fork Notice
+## Acknowledgments
 
-This repository, **telegram-mcp-worker**, is a fork of
+This project is a fork of
 [timoncool/telegram-api-mcp](https://github.com/timoncool/telegram-api-mcp)
-(based on commit `34af6ba`). All credit for the original MCP server — the
-tool registry covering the full Telegram Bot API and the stdio build — goes
-to the original author. This fork only adds the Cloudflare Worker conversion
-(`src/worker.ts`), the `/webhook` receiver, and the deployment setup used to
-run it at `telegram-mcp-worker.dawod.workers.dev`. The original MIT license
-is preserved in [LICENSE](LICENSE).
+(based on commit `34af6ba`), and it would not exist without the original
+author's work. All credit for the original MCP server — the tool registry
+covering the full Telegram Bot API and the stdio build — goes to
+[@timoncool](https://github.com/timoncool). Thank you for building it and
+for releasing it under the MIT license, which is preserved in
+[LICENSE](LICENSE). This fork only adds the Cloudflare Worker conversion
+(`src/worker.ts`), the `/webhook` receiver, and the deployment setup used
+to run it at `telegram-mcp-worker.dawod.workers.dev`.
