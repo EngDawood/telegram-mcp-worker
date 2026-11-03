@@ -1,0 +1,15 @@
+{
+  "name": "telegram-mcp-worker",
+  "owner": {
+    "name": "Dawood Saleh",
+    "url": "https://engdawood.com"
+  },
+  "plugins": [
+    {
+      "name": "telegram-mcp-worker",
+      "source": "./",
+      "description": "Telegram Bot API MCP server (all 185 methods) on a Cloudflare Worker — Streamable HTTP at /mcp plus a webhook receiver.",
+      "version": "0.2.0"
+    }
+  ]
+}

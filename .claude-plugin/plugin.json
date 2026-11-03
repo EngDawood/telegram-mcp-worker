@@ -1,0 +1,13 @@
+{
+  "name": "telegram-mcp-worker",
+  "version": "0.2.0",
+  "description": "Telegram Bot API MCP server (all 185 methods) converted to a Cloudflare Worker — Streamable HTTP at /mcp, with a built-in webhook receiver. Fork of timoncool/telegram-api-mcp (MIT).",
+  "author": {
+    "name": "Dawood Saleh",
+    "url": "https://engdawood.com"
+  },
+  "homepage": "https://engdawood.com",
+  "repository": "https://github.com/EngDawood/telegram-mcp-worker",
+  "license": "MIT",
+  "keywords": ["telegram", "telegram-bot", "bot-api", "mcp", "cloudflare-workers"]
+}

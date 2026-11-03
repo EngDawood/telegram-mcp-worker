@@ -56,6 +56,26 @@ Point any MCP client at the hosted endpoint:
 }
 ```
 
+## Claude plugin
+
+This repo is also a Claude plugin (and its own plugin marketplace). In
+Claude Code:
+
+```text
+/plugin marketplace add EngDawood/telegram-mcp-worker
+/plugin install telegram-mcp-worker@telegram-mcp-worker
+```
+
+The plugin registers the hosted MCP server from `.mcp.json`. Export your
+token first so Claude can expand it:
+
+```bash
+export MCP_AUTH_TOKEN=<your MCP_AUTH_TOKEN>
+```
+
+To deploy and use your own Worker instead, change the `url` in `.mcp.json`
+to your deployment.
+
 ## Deploy your own
 
 ### Option A — Cloudflare dashboard (GitHub-connected)
