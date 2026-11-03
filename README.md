@@ -1,12 +1,17 @@
+<div align="center">
+
 # telegram-mcp-worker
 
-The full Telegram Bot API as an MCP server, running on a **Cloudflare Worker**.
+**Ultimate MCP server for Telegram Bot API — 185 methods, full v10.2 coverage, rich messages, meta-mode, rate limiting, circuit breaker — running on Cloudflare Workers.**
 
-All 185 Bot API methods (v10.2) are exposed as MCP tools over stateless
-Streamable HTTP — 190 tools in total, including the `telegram_format` helper,
-`download_file` and the TRAIL tools. The same Worker also receives bot
-updates through a built-in webhook endpoint, so one deployment covers both
-sending and receiving.
+[![Stars](https://img.shields.io/github/stars/EngDawood/telegram-mcp-worker?style=flat-square)](https://github.com/EngDawood/telegram-mcp-worker/stargazers)
+[![License](https://img.shields.io/github/license/EngDawood/telegram-mcp-worker?style=flat-square)](LICENSE)
+[![Bot API](https://img.shields.io/badge/Telegram%20Bot%20API-10.2-26A5E4?style=flat-square&logo=telegram)](https://core.telegram.org/bots/api)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=flat-square&logo=cloudflare)](https://workers.cloudflare.com)
+
+</div>
+
+185/185 Bot API methods with Zod validation, token masking, tool annotations, and zero bloat (2 dependencies) — 190 MCP tools in total, served over stateless Streamable HTTP. The same Worker also receives bot updates through a built-in webhook endpoint, so one deployment covers both sending and receiving.
 
 **Live deployment:** `https://telegram-mcp-worker.dawod.workers.dev`
 
