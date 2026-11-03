@@ -123,6 +123,26 @@ The original stdio build is unchanged and still available:
 npm run build && npm start
 ```
 
+## From source
+
+The original stdio build still runs locally from source:
+
+```bash
+git clone https://github.com/EngDawood/telegram-mcp-worker.git
+cd telegram-mcp-worker
+npm install
+npm run build
+TELEGRAM_BOT_TOKEN=<your bot token> npm start
+```
+
+To run the Worker build locally from the same checkout instead:
+
+```bash
+npm run worker:dev
+```
+
+Put the secrets in a `.dev.vars` file first (see Local development above).
+
 ## Limitations on Workers
 
 Features of the original Node build that rely on a local filesystem return
