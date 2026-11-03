@@ -13,8 +13,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const docs = JSON.parse(readFileSync(join(ROOT, "docs", "api-params.json"), "utf8"));
-const version = readFileSync(join(ROOT, "docs", "api-version.txt"), "utf8").trim();
+const docs = JSON.parse(readFileSync(join(ROOT, "docs", "bot-api", "api-params.json"), "utf8"));
+const version = readFileSync(join(ROOT, "docs", "bot-api", "api-version.txt"), "utf8").trim();
 const { allMethods } = await import(new URL("../dist/methods/index.js", import.meta.url));
 
 const implemented = new Map(allMethods.map((m) => [m.apiMethod, m]));

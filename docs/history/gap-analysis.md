@@ -1,7 +1,7 @@
 > **Historical document.** This analysis predates this codebase: it
 > compares other Telegram MCP servers against Bot API 9.6. This server
-> covers 185/185 methods at Bot API 10.2 (see `api-version.txt` and
-> `bot-api-methods.md` in this folder). Kept for history only.
+> covers 185/185 methods at Bot API 10.2 (see `docs/bot-api/api-version.txt` and
+> `bot-api-methods.md` in `docs/bot-api/`). Kept for history only.
 
 # Gap Analysis: Existing MCP Servers vs Bot API 9.6
 

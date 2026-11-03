@@ -222,7 +222,7 @@ Telegram   ──POST /webhook───────▶ Worker ──▶ update w
 | `src/server.ts` | Builds the MCP server (shared by Worker and stdio builds) |
 | `src/index.ts` | Original stdio entry point |
 | `src/config.ts` | Environment/secrets loading and tuning knobs |
-| `docs/` | Mirror of the official Bot API documentation |
+| `docs/` | Documentation: `project/` (this codebase), `bot-api/` (official docs mirror), `history/` |
 
 ## License
 

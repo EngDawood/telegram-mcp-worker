@@ -4,7 +4,7 @@
  *
  *   node scripts/refresh-docs.mjs
  *
- * Downloads every core.telegram.org/bots/* page into docs/ and regenerates the
+ * Downloads every core.telegram.org/bots/* page into docs/bot-api/ and regenerates the
  * derived artifacts the registry is audited against:
  *   - official-method-list.txt / official-type-list.txt
  *   - api-params.json  (per-method parameter tables, machine readable)
@@ -17,7 +17,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const DOCS = join(dirname(fileURLToPath(import.meta.url)), "..", "docs");
+const DOCS = join(dirname(fileURLToPath(import.meta.url)), "..", "docs", "bot-api");
 const PAGES = ["api", "api-changelog", "features", "faq", "inline", "webhooks", "webapps", "payments", "games"];
 
 const decode = (s) =>

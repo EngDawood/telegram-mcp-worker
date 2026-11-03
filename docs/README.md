@@ -1,18 +1,19 @@
 # docs/
 
-Two kinds of files live here. Do not mix them up.
+Organized by kind. Do not mix generated files with hand-written ones.
 
-## Codebase documentation (hand-written, this fork)
+## `project/` — codebase documentation (hand-written, this fork)
 
-- [codebase.md](codebase.md) — how this codebase actually works: entry
-  points, request flow, the tool registry, full configuration reference
-  with defaults, the webhook receiver, and the Worker limits.
+- [project/codebase.md](project/codebase.md) — how this codebase actually
+  works: entry points, request flow, the tool registry, full
+  configuration reference with defaults, the webhook receiver, and the
+  Worker limits.
 
-## Bot API mirror (generated — do not hand-edit)
+## `bot-api/` — official Bot API mirror (generated, do not hand-edit)
 
-Everything else in this folder is a mirror of the official Telegram Bot
-API documentation, downloaded from core.telegram.org and used by
-`npm run audit` to prove the tool registry matches the official spec:
+A mirror of the official Telegram Bot API documentation, downloaded from
+core.telegram.org and used by `npm run audit` to prove the tool registry
+matches the official spec:
 
 - `raw-*.html` — the official Bot API pages, as published
 - `bot-api-methods.md` — the method list generated from those pages
@@ -29,8 +30,9 @@ npm run docs:refresh
 Hand edits to generated files are lost on the next refresh and can break
 the audit.
 
-## Historical
+## `history/` — historical documents
 
-- `gap-analysis.md` — a pre-project analysis of other Telegram MCP
-  servers against Bot API 9.6. Kept for history; it does not describe
-  this codebase, which covers 185/185 methods at Bot API 10.2.
+- [history/gap-analysis.md](history/gap-analysis.md) — a pre-project
+  analysis of other Telegram MCP servers against Bot API 9.6. Kept for
+  history; it does not describe this codebase, which covers 185/185
+  methods at Bot API 10.2.

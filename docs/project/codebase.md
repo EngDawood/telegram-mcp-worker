@@ -41,7 +41,7 @@ exposes:
   `telegram_find` + `telegram_call` to save context tokens
 
 `npm run audit` rebuilds and diffs the registry against the official
-docs mirror in this folder; any drift fails the audit.
+docs mirror in `docs/bot-api/`; any drift fails the audit.
 
 ## Telegram client
 
