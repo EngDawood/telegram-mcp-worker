@@ -76,6 +76,12 @@ export MCP_AUTH_TOKEN=<your MCP_AUTH_TOKEN>
 To deploy and use your own Worker instead, change the `url` in `.mcp.json`
 to your deployment.
 
+The plugin also ships a skill at
+[`skills/telegram-mcp-worker/SKILL.md`](skills/telegram-mcp-worker/SKILL.md)
+(linked from `.claude/skills/`), which teaches the agent the working rules
+above: verify with `get_me`, ask `telegram_format` before complex payloads,
+and work within the Worker limits.
+
 ## Deploy your own
 
 ### Option A — Cloudflare dashboard (GitHub-connected)
