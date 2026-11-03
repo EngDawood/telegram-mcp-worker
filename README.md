@@ -134,7 +134,36 @@ errors on Workers:
 - The TRAIL log tools
 - Mirroring URL media to disk
 
-## Project layout
+## Architecture
+
+```text
+MCP client ──POST /mcp (Bearer)──▶ Worker ──fetch──▶ api.telegram.org
+Telegram   ──POST /webhook───────▶ Worker ──▶ update written to Worker log
+```
+
+- **Stateless per request.** Each `POST /mcp` builds a fresh MCP server on
+  a web-standard Streamable HTTP transport with JSON responses. No session
+  state is kept between requests, which is what makes the design fit
+  Workers.
+- **One server builder, two transports.** `buildServer(config)` in
+  `src/server.ts` assembles the MCP server and the Telegram client from the
+  configuration; the Worker entry (`src/worker.ts`) and the original stdio
+  entry (`src/index.ts`) both use it unchanged.
+- **Declarative tool registry.** All 185 Bot API methods are defined as
+  data — name, Bot API endpoint, Zod input schema — and served by one
+  generic handler, alongside the `telegram_format` helper, `download_file`
+  and the TRAIL tools. With `TELEGRAM_META_MODE=true` the registry
+  collapses into two meta-tools (`telegram_find` / `telegram_call`).
+- **Telegram client.** A plain `fetch`-based Bot API client
+  (`src/telegram-client.ts`) with global and per-chat rate limiting, a
+  circuit breaker and retry with backoff. It also masks the bot token in
+  every response and error.
+- **Configuration.** `loadConfig` in `src/config.ts` maps the Worker's
+  secrets/vars (or environment variables in the stdio build) into one
+  validated config object.
+- **Webhook path.** `POST /webhook` verifies the secret-token header when
+  `WEBHOOK_SECRET` is set, writes the update JSON to the Worker log and
+  acknowledges immediately with `{"ok": true}`.
 
 | Path | What it is |
 |------|------------|
