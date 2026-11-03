@@ -86,7 +86,7 @@ secrets/vars in the Worker build, process env in the stdio build.
 
 | Name | Default | Purpose |
 |------|---------|---------|
-| `TELEGRAM_DEFAULT_CHAT_ID` | — | Chat used when a call omits `chat_id` |
+| `TELEGRAM_DEFAULT_CHAT_ID` | — | Chat used when a call omits `chat_id`; tool schemas then expose `chat_id` as optional |
 | `TELEGRAM_DEFAULT_THREAD_ID` | — | Forum thread used by default |
 | `TELEGRAM_META_MODE` | `false` | `true` collapses tools into the two meta-tools |
 | `TELEGRAM_GLOBAL_RATE_LIMIT` | `30` | Global requests per second |
