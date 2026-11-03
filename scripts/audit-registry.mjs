@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Diff src/methods (the MCP registry) against the local docs mirror.
+ * Diff src/mcp/methods (the MCP registry) against the local docs mirror.
  *
  *   npm run build && node scripts/audit-registry.mjs
  *
@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const docs = JSON.parse(readFileSync(join(ROOT, "docs", "bot-api", "api-params.json"), "utf8"));
 const version = readFileSync(join(ROOT, "docs", "bot-api", "api-version.txt"), "utf8").trim();
-const { allMethods } = await import(new URL("../dist/methods/index.js", import.meta.url));
+const { allMethods } = await import(new URL("../dist/mcp/methods/index.js", import.meta.url));
 
 const implemented = new Map(allMethods.map((m) => [m.apiMethod, m]));
 const problems = [];

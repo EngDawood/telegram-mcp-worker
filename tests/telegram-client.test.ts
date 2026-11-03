@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { TelegramClient, TelegramApiError } from "../src/telegram-client.js";
-import { Config } from "../src/config.js";
+import { TelegramClient, TelegramApiError } from "../src/telegram/telegram-client.js";
+import { Config } from "../src/core/config.js";
 
 function makeConfig(overrides: Partial<Config> = {}): Config {
   return {

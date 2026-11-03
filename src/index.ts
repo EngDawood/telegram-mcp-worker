@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { loadConfig } from "./config.js";
-import { startServer } from "./server.js";
+import { loadConfig } from "./core/config.js";
+import { startServer } from "./mcp/server.js";
 
 async function main(): Promise<void> {
   try {

@@ -1,9 +1,9 @@
 import { readFile, writeFile, stat, mkdir, unlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, extname, isAbsolute, join, resolve, normalize, sep } from "node:path";
-import { Config } from "./config.js";
-import { RateLimiter } from "./rate-limiter.js";
-import { CircuitBreaker, CircuitOpenError } from "./circuit-breaker.js";
+import { Config } from "../core/config.js";
+import { RateLimiter } from "../core/rate-limiter.js";
+import { CircuitBreaker, CircuitOpenError } from "../core/circuit-breaker.js";
 
 /** Default fetch timeout: 60 seconds */
 const FETCH_TIMEOUT_MS = 60_000;

@@ -3,13 +3,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { Config } from "./config.js";
-import { TelegramClient, TelegramApiError } from "./telegram-client.js";
+import { Config } from "../core/config.js";
+import { TelegramClient, TelegramApiError } from "../telegram/telegram-client.js";
 import { MethodDef, buildZodSchema } from "./method-registry.js";
 import { allMethods, searchMethods, findMethodByApiName } from "./methods/index.js";
-import { CircuitOpenError } from "./circuit-breaker.js";
+import { CircuitOpenError } from "../core/circuit-breaker.js";
 import { FORMATS, findFormat, formatIndex } from "./formats.js";
-import { Trail } from "./trail.js";
+import { Trail } from "../trail/trail.js";
 
 /** Pre-built Zod schemas for all methods (built once, reused on every call). */
 const schemaCache = new Map<string, ReturnType<typeof buildZodSchema>>();

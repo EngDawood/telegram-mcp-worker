@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CircuitBreaker, CircuitOpenError } from "../src/circuit-breaker.js";
+import { CircuitBreaker, CircuitOpenError } from "../src/core/circuit-breaker.js";
 
 describe("CircuitBreaker", () => {
   it("starts in closed state", () => {

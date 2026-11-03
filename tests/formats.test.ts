@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { FORMATS, findFormat, formatIndex } from "../src/formats.js";
-import { RICH_MESSAGE_LIMITS } from "../src/method-registry.js";
+import { FORMATS, findFormat, formatIndex } from "../src/mcp/formats.js";
+import { RICH_MESSAGE_LIMITS } from "../src/mcp/method-registry.js";
 
 describe("formats", () => {
   it("resolves every topic by its own name", () => {

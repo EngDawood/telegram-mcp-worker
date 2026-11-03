@@ -24,8 +24,8 @@
  * TELEGRAM_* tuning knobs documented in src/config.ts.
  */
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { loadConfig } from "./config.js";
-import { buildServer } from "./server.js";
+import { loadConfig } from "./core/config.js";
+import { buildServer } from "./mcp/server.js";
 
 export interface Env {
   TELEGRAM_BOT_TOKEN?: string;

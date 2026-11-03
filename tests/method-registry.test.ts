@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { allMethods, findMethodByToolName, findMethodByApiName, searchMethods } from "../src/methods/index.js";
-import { buildZodSchema, buildJsonSchema, RICH_MESSAGE_LIMITS } from "../src/method-registry.js";
+import { allMethods, findMethodByToolName, findMethodByApiName, searchMethods } from "../src/mcp/methods/index.js";
+import { buildZodSchema, buildJsonSchema, RICH_MESSAGE_LIMITS } from "../src/mcp/method-registry.js";
 
 /** Source of truth is the docs mirror, not a hardcoded number that rots on every release. */
-const officialMethods = readFileSync(resolve(__dirname, "../docs/official-method-list.txt"), "utf-8")
+const officialMethods = readFileSync(resolve(__dirname, "../docs/bot-api/official-method-list.txt"), "utf-8")
   .trim().split("\n").map((s) => s.trim()).filter(Boolean);
 
 describe("Method Registry", () => {
