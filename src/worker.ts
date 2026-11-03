@@ -9,6 +9,16 @@
  *   TELEGRAM_BOT_TOKEN  — required, from @BotFather
  *   MCP_AUTH_TOKEN      — optional; when set, clients must send
  *                         `Authorization: Bearer <MCP_AUTH_TOKEN>`
+ *   WEBHOOK_SECRET      — optional; when set, POST /webhook only accepts
+ *                         updates whose `X-Telegram-Bot-Api-Secret-Token`
+ *                         header matches (register the same value as the
+ *                         setWebhook secret_token).
+ *
+ * Webhook: point the bot's webhook at POST /webhook on this worker (via the
+ * set_webhook MCP tool). Updates are written to the worker log (Workers
+ * observability / wrangler tail). While a webhook is set, get_updates
+ * returns an error on Telegram's side, so delete the webhook first if you
+ * want to poll again.
  * Optional vars: TELEGRAM_DEFAULT_CHAT_ID, TELEGRAM_DEFAULT_THREAD_ID,
  * TELEGRAM_META_MODE ("true" = 2 meta-tools instead of all methods), and the
  * TELEGRAM_* tuning knobs documented in src/config.ts.
@@ -20,6 +30,7 @@ import { buildServer } from "./server.js";
 export interface Env {
   TELEGRAM_BOT_TOKEN?: string;
   MCP_AUTH_TOKEN?: string;
+  WEBHOOK_SECRET?: string;
   [key: string]: string | undefined;
 }
 
@@ -39,6 +50,33 @@ export default {
         "telegram-api-mcp worker is running. MCP endpoint: POST /mcp\n",
         { headers: { "content-type": "text/plain; charset=utf-8" } }
       );
+    }
+
+    if (url.pathname === "/webhook") {
+      if (request.method === "GET") {
+        return new Response(
+          "telegram webhook endpoint is active. Telegram delivers updates via POST.\n",
+          { headers: { "content-type": "text/plain; charset=utf-8" } }
+        );
+      }
+      if (request.method !== "POST") {
+        return json({ error: "method_not_allowed" }, 405);
+      }
+      if (env.WEBHOOK_SECRET) {
+        if (request.headers.get("x-telegram-bot-api-secret-token") !== env.WEBHOOK_SECRET) {
+          return json({ error: "unauthorized" }, 401);
+        }
+      }
+      let update: unknown;
+      try {
+        update = await request.json();
+      } catch {
+        return json({ error: "invalid_json" }, 400);
+      }
+      // v1 receiver: acknowledge fast and keep the update in the worker log
+      // (visible in the Cloudflare dashboard observability / wrangler tail).
+      console.log("telegram_update", JSON.stringify(update));
+      return json({ ok: true });
     }
 
     if (url.pathname !== "/mcp") {
