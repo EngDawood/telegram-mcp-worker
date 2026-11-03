@@ -216,3 +216,9 @@ for releasing it under the MIT license, which is preserved in
 [LICENSE](LICENSE). This fork only adds the Cloudflare Worker conversion
 (`src/worker.ts`), the `/webhook` receiver, and the deployment setup used
 to run it at `telegram-mcp-worker.dawod.workers.dev`.
+
+> **This fork (`telegram-mcp-worker`)** converts the server below to a
+> **Cloudflare Worker**: the same 185 Bot API tools served over stateless
+> Streamable HTTP at `POST /mcp` (`src/worker.ts`). Based on
+> [timoncool/telegram-api-mcp](https://github.com/timoncool/telegram-api-mcp)
+> @ `34af6ba` (MIT — see LICENSE).
