@@ -1,0 +1,64 @@
+{
+  "name": "telegram-mcp-worker",
+  "version": "0.2.0",
+  "description": "Ultimate Telegram Bot API v10.2 MCP Server — 185 methods incl. rich messages, meta-mode, rate limiting, circuit breaker",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "telegram-api-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "docs:refresh": "node scripts/refresh-docs.mjs",
+    "audit": "npm run build && node scripts/audit-registry.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy"
+  },
+  "keywords": [
+    "telegram",
+    "bot-api",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "ai-agent"
+  ],
+  "author": "timoncool",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "server.json",
+    "smithery.yaml"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timoncool/telegram-api-mcp.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^10.2.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "wrangler": "^4.156.2"
+  }
+}
