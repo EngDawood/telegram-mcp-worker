@@ -8,3 +8,6 @@ coverage/
 .dev.vars
 
 .wrangler/
+
+# TRAIL runtime logs (created on demand by the stdio build)
+data/

@@ -8,6 +8,8 @@ Organized by kind. Do not mix generated files with hand-written ones.
   works: entry points, request flow, the tool registry, full
   configuration reference with defaults, the webhook receiver, and the
   Worker limits.
+- [project/mcp.md](project/mcp.md) — the MCP surface: hosted endpoint,
+  client config, meta-mode, and the Claude plugin packaging.
 
 ## `bot-api/` — official Bot API mirror (generated, do not hand-edit)
 

@@ -197,7 +197,7 @@ Telegram   ──POST /webhook───────▶ Worker ──▶ update w
   state is kept between requests, which is what makes the design fit
   Workers.
 - **One server builder, two transports.** `buildServer(config)` in
-  `src/server.ts` assembles the MCP server and the Telegram client from the
+  `src/mcp/server.ts` assembles the MCP server and the Telegram client from the
   configuration; the Worker entry (`src/worker.ts`) and the original stdio
   entry (`src/index.ts`) both use it unchanged.
 - **Declarative tool registry.** All 185 Bot API methods are defined as
@@ -206,10 +206,10 @@ Telegram   ──POST /webhook───────▶ Worker ──▶ update w
   and the TRAIL tools. With `TELEGRAM_META_MODE=true` the registry
   collapses into two meta-tools (`telegram_find` / `telegram_call`).
 - **Telegram client.** A plain `fetch`-based Bot API client
-  (`src/telegram-client.ts`) with global and per-chat rate limiting, a
+  (`src/telegram/telegram-client.ts`) with global and per-chat rate limiting, a
   circuit breaker and retry with backoff. It also masks the bot token in
   every response and error.
-- **Configuration.** `loadConfig` in `src/config.ts` maps the Worker's
+- **Configuration.** `loadConfig` in `src/core/config.ts` maps the Worker's
   secrets/vars (or environment variables in the stdio build) into one
   validated config object.
 - **Webhook path.** `POST /webhook` verifies the secret-token header when
@@ -219,7 +219,10 @@ Telegram   ──POST /webhook───────▶ Worker ──▶ update w
 | Path | What it is |
 |------|------------|
 | `src/worker.ts` | Cloudflare Worker entry: `/mcp`, `/webhook`, `/health` |
-| `src/server.ts` | Builds the MCP server (shared by Worker and stdio builds) |
+| `src/mcp/` | MCP server: `server.ts`, `method-registry.ts`, `formats.ts`, `methods/` |
+| `src/telegram/` | `telegram-client.ts`, the Bot API client |
+| `src/core/` | `config.ts`, `rate-limiter.ts`, `circuit-breaker.ts` |
+| `src/trail/` | TRAIL protocol: `trail.ts`, `post-log.ts` |
 | `src/index.ts` | Original stdio entry point |
 | `src/config.ts` | Environment/secrets loading and tuning knobs |
 | `docs/` | Documentation: `project/` (this codebase), `bot-api/` (official docs mirror), `history/` |

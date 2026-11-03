@@ -3,6 +3,18 @@
 How `telegram-mcp-worker` works, as the code stands. For installation and
 usage see the top-level [README](../README.md).
 
+## Layout
+
+```text
+src/
+├── worker.ts            Worker entry (stays at the root: wrangler.toml points at it)
+├── index.ts             stdio entry (package bin)
+├── mcp/                 server.ts, method-registry.ts, formats.ts, methods/ (the registry)
+├── telegram/            telegram-client.ts (Bot API client)
+├── core/                config.ts, rate-limiter.ts, circuit-breaker.ts
+└── trail/               trail.ts, post-log.ts (TRAIL protocol)
+```
+
 ## Entry points
 
 | Entry | File | Transport |
@@ -10,7 +22,7 @@ usage see the top-level [README](../README.md).
 | Cloudflare Worker | `src/worker.ts` | Streamable HTTP (stateless) |
 | stdio (original) | `src/index.ts` | stdio |
 
-Both call `buildServer(config)` from `src/server.ts`, which assembles one
+Both call `buildServer(config)` from `src/mcp/server.ts`, which assembles one
 MCP server plus one Telegram client from a single config object. Nothing
 in the server or registry code knows which transport is in use.
 
@@ -30,7 +42,7 @@ in the server or registry code knows which transport is in use.
 
 All 185 Bot API methods are declared as data — tool name, Bot API
 endpoint, Zod input schema, annotations — and executed by one generic
-handler in `src/server.ts`. Adding a Bot API method means adding a
+handler in `src/mcp/server.ts`. Adding a Bot API method means adding a
 registry entry, not a new function. On top of the registry the server
 exposes:
 
@@ -45,7 +57,7 @@ docs mirror in `docs/bot-api/`; any drift fails the audit.
 
 ## Telegram client
 
-`src/telegram-client.ts` is a plain `fetch` client for
+`src/telegram/telegram-client.ts` is a plain `fetch` client for
 `api.telegram.org` with:
 
 - Rate limiting — global token bucket (default 30 req/s) plus a per-chat
@@ -59,7 +71,7 @@ docs mirror in `docs/bot-api/`; any drift fails the audit.
 
 ## Configuration
 
-`loadConfig` in `src/config.ts` reads one flat environment map — Worker
+`loadConfig` in `src/core/config.ts` reads one flat environment map — Worker
 secrets/vars in the Worker build, process env in the stdio build.
 
 ### Secrets
@@ -70,7 +82,7 @@ secrets/vars in the Worker build, process env in the stdio build.
 | `MCP_AUTH_TOKEN` | No | When set, `POST /mcp` requires `Authorization: Bearer <token>` |
 | `WEBHOOK_SECRET` | No | When set, `POST /webhook` requires the matching `X-Telegram-Bot-Api-Secret-Token` header |
 
-### Variables (with defaults from `src/config.ts`)
+### Variables (with defaults from `src/core/config.ts`)
 
 | Name | Default | Purpose |
 |------|---------|---------|
