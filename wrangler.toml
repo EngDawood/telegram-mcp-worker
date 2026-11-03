@@ -12,3 +12,6 @@ enabled = true
 # Optional plain vars can go here or in the dashboard, e.g.:
 # [vars]
 # TELEGRAM_META_MODE = "true"
+
+[vars]
+TELEGRAM_DEFAULT_CHAT_ID = "801062947"
