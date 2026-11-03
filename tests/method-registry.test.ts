@@ -241,3 +241,14 @@ describe("Method Registry", () => {
     }
   });
 });
+
+describe("buildZodSchema with a default chat", () => {
+  it("makes chat_id optional when a default chat is configured", () => {
+    const method = findMethodByApiName("sendMessage");
+    expect(method).toBeDefined();
+    const withDefault = buildZodSchema(method!.params, { defaultChatId: "801062947" });
+    expect(withDefault.safeParse({ text: "hi" }).success).toBe(true);
+    const withoutDefault = buildZodSchema(method!.params);
+    expect(withoutDefault.safeParse({ text: "hi" }).success).toBe(false);
+  });
+});

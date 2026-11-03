@@ -17,11 +17,15 @@ const schemaCache = new Map<string, ReturnType<typeof buildZodSchema>>();
 /** Module-level TRAIL instance for auto-logging in callTelegram. */
 let trailInstance: Trail | null = null;
 
-function getSchema(method: MethodDef): ReturnType<typeof buildZodSchema> {
-  let schema = schemaCache.get(method.apiMethod);
+function getSchema(
+  method: MethodDef,
+  defaultChatId?: string
+): ReturnType<typeof buildZodSchema> {
+  const cacheKey = defaultChatId ? `${method.apiMethod}:default-chat` : method.apiMethod;
+  let schema = schemaCache.get(cacheKey);
   if (!schema) {
-    schema = buildZodSchema(method.params);
-    schemaCache.set(method.apiMethod, schema);
+    schema = buildZodSchema(method.params, { defaultChatId });
+    schemaCache.set(cacheKey, schema);
   }
   return schema;
 }
@@ -38,9 +42,9 @@ export function buildServer(config: Config): { server: McpServer; client: Telegr
   log("info", `Starting server in ${config.metaMode ? "meta" : "standard"} mode with ${allMethods.length} methods`);
 
   if (config.metaMode) {
-    registerMetaTools(server, client);
+    registerMetaTools(server, client, config);
   } else {
-    registerAllTools(server, client);
+    registerAllTools(server, client, config);
   }
 
   registerFormatTool(server);
@@ -66,9 +70,9 @@ export async function startServer(config: Config): Promise<void> {
 
 // ─── Standard Mode ──────────────────────────────────────────────────────
 
-function registerAllTools(server: McpServer, client: TelegramClient): void {
+function registerAllTools(server: McpServer, client: TelegramClient, config: Config): void {
   for (const method of allMethods) {
-    const zodSchema = getSchema(method);
+    const zodSchema = getSchema(method, config.defaultChatId);
 
     const annotations = method.annotations || { destructiveHint: false };
 
@@ -86,7 +90,7 @@ function registerAllTools(server: McpServer, client: TelegramClient): void {
 
 // ─── Meta Mode ──────────────────────────────────────────────────────────
 
-function registerMetaTools(server: McpServer, client: TelegramClient): void {
+function registerMetaTools(server: McpServer, client: TelegramClient, config: Config): void {
   server.tool(
     "telegram_find",
     "Search Telegram Bot API methods by keyword. Returns matching methods with their parameters. Use this to discover available methods before calling them.",
@@ -145,7 +149,7 @@ function registerMetaTools(server: McpServer, client: TelegramClient): void {
         };
       }
 
-      return executeMethod(client, methodDef, (args.params || {}) as Record<string, unknown>);
+      return executeMethod(client, methodDef, (args.params || {}) as Record<string, unknown>, config.defaultChatId);
     }
   );
 }
@@ -342,9 +346,10 @@ function registerDownloadTool(server: McpServer, client: TelegramClient): void {
 async function executeMethod(
   client: TelegramClient,
   method: MethodDef,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  defaultChatId?: string
 ): Promise<{ content: { type: "text"; text: string }[]; isError?: boolean }> {
-  const schema = getSchema(method);
+  const schema = getSchema(method, defaultChatId);
   const parseResult = schema.safeParse(params);
 
   if (!parseResult.success) {

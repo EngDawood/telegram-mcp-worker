@@ -322,11 +322,18 @@ export function commonEditParams(): ParamDef[] {
 
 // ─── Build Zod schema from ParamDefs ────────────────────────────────────
 
-export function buildZodSchema(params: ParamDef[]): z.ZodObject<Record<string, ZodTypeAny>> {
+export function buildZodSchema(
+  params: ParamDef[],
+  opts?: { defaultChatId?: string }
+): z.ZodObject<Record<string, ZodTypeAny>> {
   const shape: Record<string, ZodTypeAny> = {};
 
   for (const param of params) {
-    shape[param.name] = param.required ? param.type : param.type.optional();
+    // With a default chat configured, chat_id is filled in by the client
+    // (see TelegramClient), so it must not be a required input.
+    const required =
+      param.required && !(opts?.defaultChatId && param.name === "chat_id");
+    shape[param.name] = required ? param.type : param.type.optional();
   }
 
   return z.object(shape);
