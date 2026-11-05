@@ -7,8 +7,11 @@
  *
  * Secrets (wrangler secret put / .dev.vars):
  *   TELEGRAM_BOT_TOKEN  — required, from @BotFather
- *   MCP_AUTH_TOKEN      — optional; when set, clients must send
- *                         `Authorization: Bearer <MCP_AUTH_TOKEN>`
+ *   MCP_AUTH_TOKEN      — optional; when set, clients must send the token
+ *                         in one of: `Authorization: Bearer <MCP_AUTH_TOKEN>`,
+ *                         `x-api-key: <MCP_AUTH_TOKEN>` or
+ *                         `api-key: <MCP_AUTH_TOKEN>` (same token, any header
+ *                         the client supports).
  *   WEBHOOK_SECRET      — optional; when set, POST /webhook only accepts
  *                         updates whose `X-Telegram-Bot-Api-Secret-Token`
  *                         header matches (register the same value as the
@@ -32,6 +35,19 @@ export interface Env {
   MCP_AUTH_TOKEN?: string;
   WEBHOOK_SECRET?: string;
   [key: string]: string | undefined;
+}
+
+/**
+ * A request is authorized when it carries the MCP_AUTH_TOKEN in any of the
+ * credential headers MCP clients commonly support: Bearer authorization,
+ * `x-api-key`, or `api-key`. Header names are case-insensitive (Headers
+ * normalizes them); the token value must match exactly.
+ */
+function isAuthorized(request: Request, token: string): boolean {
+  if (request.headers.get("authorization") === `Bearer ${token}`) return true;
+  if (request.headers.get("x-api-key") === token) return true;
+  if (request.headers.get("api-key") === token) return true;
+  return false;
 }
 
 function json(body: unknown, status = 200): Response {
@@ -84,7 +100,7 @@ export default {
     }
 
     if (env.MCP_AUTH_TOKEN) {
-      if (request.headers.get("authorization") !== `Bearer ${env.MCP_AUTH_TOKEN}`) {
+      if (!isAuthorized(request, env.MCP_AUTH_TOKEN)) {
         return json({ error: "unauthorized" }, 401);
       }
     }

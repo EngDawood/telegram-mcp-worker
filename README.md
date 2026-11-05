@@ -29,8 +29,10 @@
 - **Webhook receiver** (`POST /webhook`) — acknowledges updates and writes
   them to the Worker log (Cloudflare observability / `wrangler tail`),
   optionally verified with Telegram's secret-token header.
-- **Bearer auth for `/mcp`** — when `MCP_AUTH_TOKEN` is set, clients must
-  send `Authorization: Bearer <MCP_AUTH_TOKEN>`.
+- **Token auth for `/mcp`** — when `MCP_AUTH_TOKEN` is set, clients must
+  send the token in any header their connector supports:
+  `Authorization: Bearer <MCP_AUTH_TOKEN>`, `x-api-key: <MCP_AUTH_TOKEN>`
+  or `api-key: <MCP_AUTH_TOKEN>` (same token, three header options).
 - **GitHub-connected deployment** — pushes to `main` deploy automatically
   from the Cloudflare dashboard.
 
@@ -107,7 +109,7 @@ npm run worker:deploy
 | Secret | Required | Purpose |
 |--------|:---:|---------|
 | `TELEGRAM_BOT_TOKEN` | Yes | Bot token from [@BotFather](https://t.me/BotFather) |
-| `MCP_AUTH_TOKEN` | Recommended | Bearer token clients must send to `POST /mcp`. Without it the endpoint is open. |
+| `MCP_AUTH_TOKEN` | Recommended | Token clients must send to `POST /mcp` as `Authorization: Bearer`, `x-api-key` or `api-key`. Without it the endpoint is open. |
 | `WEBHOOK_SECRET` | Optional | When set, `POST /webhook` only accepts updates whose `X-Telegram-Bot-Api-Secret-Token` header matches it. Register the same value as the `setWebhook` `secret_token`. |
 
 Optional plain variables (`TELEGRAM_DEFAULT_CHAT_ID`,
