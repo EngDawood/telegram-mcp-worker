@@ -6,8 +6,11 @@ import worker, { type Env } from "../src/worker.js";
 // with 500 server_misconfigured, while a rejected one stops at 401.
 const env: Env = { MCP_AUTH_TOKEN: "test-secret" };
 
-function mcpRequest(headers: Record<string, string> = {}): Request {
-  return new Request("https://worker.test/mcp", {
+function mcpRequest(
+  headers: Record<string, string> = {},
+  query = ""
+): Request {
+  return new Request(`https://worker.test/mcp${query}`, {
     method: "POST",
     headers: { "content-type": "application/json", ...headers },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" }),
@@ -62,6 +65,16 @@ describe("Worker /mcp auth", () => {
 
   it("rejects a wrong api-key", async () => {
     const res = await worker.fetch(mcpRequest({ "api-key": "wrong" }), env);
+    expect(res.status).toBe(401);
+  });
+
+  it("accepts ?token=<token> in the URL", async () => {
+    const res = await worker.fetch(mcpRequest({}, "?token=test-secret"), env);
+    expect(res.status).not.toBe(401);
+  });
+
+  it("rejects a wrong ?token=", async () => {
+    const res = await worker.fetch(mcpRequest({}, "?token=wrong"), env);
     expect(res.status).toBe(401);
   });
 });

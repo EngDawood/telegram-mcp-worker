@@ -9,8 +9,9 @@
  *   TELEGRAM_BOT_TOKEN  — required, from @BotFather
  *   MCP_AUTH_TOKEN      — optional; when set, clients must send the token
  *                         in one of: `Authorization: Bearer <MCP_AUTH_TOKEN>`,
- *                         `x-api-key: <MCP_AUTH_TOKEN>` or
- *                         `api-key: <MCP_AUTH_TOKEN>` (same token, any header
+ *                         `x-api-key: <MCP_AUTH_TOKEN>`,
+ *                         `api-key: <MCP_AUTH_TOKEN>` or the URL query
+ *                         `?token=<MCP_AUTH_TOKEN>` (same token, any form
  *                         the client supports).
  *   WEBHOOK_SECRET      — optional; when set, POST /webhook only accepts
  *                         updates whose `X-Telegram-Bot-Api-Secret-Token`
@@ -39,14 +40,17 @@ export interface Env {
 
 /**
  * A request is authorized when it carries the MCP_AUTH_TOKEN in any of the
- * credential headers MCP clients commonly support: Bearer authorization,
- * `x-api-key`, or `api-key`. Header names are case-insensitive (Headers
- * normalizes them); the token value must match exactly.
+ * credential forms MCP clients commonly support: Bearer authorization, the
+ * `x-api-key` or `api-key` headers, or a `?token=` query parameter (for
+ * URL-only clients; headers are preferred because URLs get logged). Header
+ * names are case-insensitive (Headers normalizes them); the token value
+ * must match exactly.
  */
 function isAuthorized(request: Request, token: string): boolean {
   if (request.headers.get("authorization") === `Bearer ${token}`) return true;
   if (request.headers.get("x-api-key") === token) return true;
   if (request.headers.get("api-key") === token) return true;
+  if (new URL(request.url).searchParams.get("token") === token) return true;
   return false;
 }
 
