@@ -11,7 +11,7 @@ src/
 ├── index.ts             stdio entry (package bin)
 ├── mcp/                 server.ts, method-registry.ts, formats.ts, methods/ (the registry)
 ├── telegram/            telegram-client.ts (Bot API client)
-├── core/                config.ts, rate-limiter.ts, circuit-breaker.ts
+├── core/                config.ts, rate-limiter.ts, circuit-breaker.ts, file-store.ts (R2 temp files)
 └── trail/               trail.ts, post-log.ts (TRAIL protocol)
 ```
 
@@ -36,6 +36,7 @@ in the server or registry code knows which transport is in use.
 | `POST /mcp` | Bearer check (when `MCP_AUTH_TOKEN` is set), then a fresh MCP server per request on the SDK's web-standard Streamable HTTP transport, JSON responses, no session |
 | `POST /webhook` | Telegram update receiver (below) |
 | `GET /webhook` | Plain-text status of the webhook endpoint |
+| `GET /files/<uuid>/<name>` | Temporary file from the `FILES` R2 bucket; 404 once older than `FILES_TTL_SECONDS` |
 | anything else | `404 {"error":"not_found"}` |
 
 ## Tool registry
@@ -48,7 +49,8 @@ exposes:
 
 - `telegram_format` — explains the exact JSON shape of complex payloads
   (also as MCP resources under `telegram://format/…`)
-- `download_file` and the TRAIL tools
+- `download_file`, `get_message_file` (file of an existing message, via a
+  silent forward that is deleted again) and the TRAIL tools
 - Meta-mode: with `TELEGRAM_META_MODE=true`, the registry collapses into
   `telegram_find` + `telegram_call` to save context tokens
 
@@ -96,6 +98,13 @@ secrets/vars in the Worker build, process env in the stdio build.
 | `TELEGRAM_CB_COOLDOWN` | `30000` | Breaker cooldown in ms |
 | `TELEGRAM_MAX_FILE_SIZE` | `52428800` | Max upload size in bytes (50 MB) |
 | `TELEGRAM_ALLOWED_UPLOAD_DIRS` | — | Comma-separated dirs the stdio build may upload from |
+| `FILES_TTL_SECONDS` | `3600` | Lifetime of a temporary file URL (Worker) |
+
+### Bindings
+
+| Name | Required | Purpose |
+|------|:---:|---------|
+| `FILES` | No | R2 bucket for files fetched by `download_file` / `get_message_file`; see `src/core/file-store.ts` |
 
 ## Webhook receiver
 
@@ -116,8 +125,10 @@ Telegram rejects `get_updates`; `delete_webhook` restores polling.
 
 The Worker runtime has no local filesystem, so features of the stdio
 build that rely on `node:fs` return errors when called on the Worker:
-uploads from local paths, `download_file`, the TRAIL log tools, and
-mirroring URL media to disk. Everything addressed by `file_id`, URL or
+uploads from local paths, the TRAIL log tools, and mirroring URL media
+to disk. `download_file` and `get_message_file` work through the `FILES`
+R2 bucket and return a short-lived URL; without that binding they return
+an error (and `get_message_file` still returns the `file_id`). Everything addressed by `file_id`, URL or
 bytes works.
 
 ## Plugin packaging

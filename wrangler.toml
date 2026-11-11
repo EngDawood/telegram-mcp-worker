@@ -15,3 +15,10 @@ enabled = true
 
 [vars]
 TELEGRAM_DEFAULT_CHAT_ID = "801062947"
+
+# Temporary file storage for download_file / get_message_file.
+# Create the bucket once:  wrangler r2 bucket create telegram-mcp-files
+# Purge leftovers daily:   wrangler r2 bucket lifecycle add telegram-mcp-files expire-tmp tmp/ --expire-days 1
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "telegram-mcp-files"
