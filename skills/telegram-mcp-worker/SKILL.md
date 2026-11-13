@@ -1,6 +1,6 @@
 ---
 name: telegram-mcp-worker
-description: Send and receive Telegram messages through the telegram-mcp-worker MCP server (the full Bot API as 190 tools on a Cloudflare Worker). Use whenever the task involves Telegram — sending a message, photo, document or poll to a chat, reading a chat or the bot's updates, checking webhook status, or formatting rich Telegram content.
+description: Send and receive Telegram messages through the telegram-mcp-worker MCP server (the full Bot API as 191 tools on a Cloudflare Worker). Use whenever the task involves Telegram — sending a message, photo, document or poll to a chat, reading a chat or the bot's updates, checking webhook status, or formatting rich Telegram content.
 ---
 
 # Telegram via telegram-mcp-worker
@@ -54,8 +54,14 @@ its schema, then invoke it through `telegram_call`.
 
 ## Limits to respect
 
-- The Worker cannot run filesystem tools: local-path uploads,
-  `download_file` and the TRAIL log tools return errors. Work around them
-  with `file_id`/URL-based calls.
+- The Worker cannot run filesystem tools: local-path uploads and the
+  TRAIL log tools return errors. Work around them with `file_id`/URL-based
+  calls.
+- To get a file out of Telegram: `download_file` (by `file_id`) or
+  `get_message_file` (by chat + message ID; for `t.me/c/1234567890/150`
+  use `from_chat_id` `-1001234567890`, `message_id` `150`). Both return a
+  download URL that expires after about an hour, so fetch it promptly.
+  The Bot API has no "read message by ID" method; `get_message_file` is
+  the way to reach an old message's file.
 - Respect Telegram rate limits the server reports (429 with
   `retry_after`); do not retry in a tight loop.

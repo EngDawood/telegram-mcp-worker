@@ -10,7 +10,7 @@ interface. For internals see [codebase.md](codebase.md).
 | URL | `https://telegram-mcp-worker.dawod.workers.dev/mcp` |
 | Transport | Streamable HTTP, stateless, JSON responses |
 | Auth | `Authorization: Bearer <MCP_AUTH_TOKEN>` (401 when missing/wrong) |
-| Tools | 190 — the 185 Bot API methods plus `telegram_format`, `download_file` and 3 TRAIL tools |
+| Tools | 191 — the 185 Bot API methods plus `telegram_format`, `download_file`, `get_message_file` and 3 TRAIL tools |
 
 Client config (`.mcp.json`):
 
@@ -28,7 +28,7 @@ Client config (`.mcp.json`):
 
 ## Meta-mode
 
-With `TELEGRAM_META_MODE=true` on the server, the 190 tools collapse into
+With `TELEGRAM_META_MODE=true` on the server, the 185 Bot API tools collapse into
 two: `telegram_find` (search the registry) and `telegram_call` (invoke a
 method by name with its schema). Same coverage, ~99% fewer tool tokens.
 

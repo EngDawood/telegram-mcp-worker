@@ -11,7 +11,7 @@
 
 </div>
 
-185/185 Bot API methods with Zod validation, token masking, tool annotations, and zero bloat (2 dependencies) — 190 MCP tools in total, served over stateless Streamable HTTP. The same Worker also receives bot updates through a built-in webhook endpoint, so one deployment covers both sending and receiving.
+185/185 Bot API methods with Zod validation, token masking, tool annotations, and zero bloat (2 dependencies) — 191 MCP tools in total, served over stateless Streamable HTTP. The same Worker also receives bot updates through a built-in webhook endpoint, so one deployment covers both sending and receiving.
 
 **Live deployment:** `https://telegram-mcp-worker.dawod.workers.dev`
 
@@ -184,9 +184,35 @@ errors on Workers:
 
 - Uploading files from local paths (sending by `file_id`, URL or bytes
   works as before)
-- `download_file`
 - The TRAIL log tools
 - Mirroring URL media to disk
+
+## Temporary file storage
+
+`download_file` and `get_message_file` need somewhere to put the file. On
+Workers that is an R2 bucket bound as `FILES` (already declared in
+`wrangler.toml`):
+
+```bash
+wrangler r2 bucket create telegram-mcp-files
+```
+
+```bash
+wrangler r2 bucket lifecycle add telegram-mcp-files expire-tmp tmp/ --expire-days 1
+```
+
+Both tools then return a download URL served by the Worker at
+`GET /files/<uuid>/<name>`. The URL needs no auth header — the random
+UUID is the secret — and stops working after `FILES_TTL_SECONDS`
+(default 3600). The lifecycle rule removes files nobody fetched. Without
+the binding the tools return the `file_id` and a clear error instead of a
+URL.
+
+`get_message_file` exists because the Bot API cannot read a message by
+ID. Given a chat and message ID (for `t.me/c/1234567890/150`:
+`from_chat_id` `-1001234567890`, `message_id` `150`) it forwards the
+message silently to a scratch chat (default: `TELEGRAM_DEFAULT_CHAT_ID`),
+reads the `file_id`, deletes the forwarded copy and downloads the file.
 
 ## Architecture
 
@@ -205,8 +231,8 @@ Telegram   ──POST /webhook───────▶ Worker ──▶ update w
   entry (`src/index.ts`) both use it unchanged.
 - **Declarative tool registry.** All 185 Bot API methods are defined as
   data — name, Bot API endpoint, Zod input schema — and served by one
-  generic handler, alongside the `telegram_format` helper, `download_file`
-  and the TRAIL tools. With `TELEGRAM_META_MODE=true` the registry
+  generic handler, alongside the `telegram_format` helper, `download_file`,
+  `get_message_file` and the TRAIL tools. With `TELEGRAM_META_MODE=true` the registry
   collapses into two meta-tools (`telegram_find` / `telegram_call`).
 - **Telegram client.** A plain `fetch`-based Bot API client
   (`src/telegram/telegram-client.ts`) with global and per-chat rate limiting, a

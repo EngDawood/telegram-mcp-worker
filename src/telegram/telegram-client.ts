@@ -508,8 +508,11 @@ export class TelegramClient {
     return new Blob([buffer]);
   }
 
-  /** Download a file by file_id. Returns the local path. */
-  async downloadFile(fileId: string, destDir: string): Promise<string> {
+  /**
+   * Fetch a file's bytes by file_id (getFile + download). Works on any
+   * runtime; the caller decides where the bytes go.
+   */
+  async fetchFile(fileId: string): Promise<{ fileName: string; data: ArrayBuffer }> {
     // Step 1: getFile to get file_path
     const fileInfo = (await this.call("getFile", { file_id: fileId })) as {
       file_id: string;
@@ -531,26 +534,31 @@ export class TelegramClient {
       if (!response.ok) {
         throw new Error(`Download failed: HTTP ${response.status}`);
       }
-
-      const buffer = Buffer.from(await response.arrayBuffer());
-
-      // Determine filename from file_path
       const fileName = fileInfo.file_path.split("/").pop() || `file_${fileId}`;
-      const destPath = resolve(normalize(join(destDir, fileName)));
-
-      // Security: ensure dest is inside destDir
-      const normalizedDir = resolve(normalize(destDir));
-      if (!destPath.startsWith(normalizedDir + sep) && destPath !== normalizedDir) {
-        throw new Error(`Path traversal blocked: ${destPath} is not inside ${normalizedDir}`);
-      }
-
-      await mkdir(dirname(destPath), { recursive: true });
-      await writeFile(destPath, buffer);
-
-      return destPath;
+      return { fileName, data: await response.arrayBuffer() };
+    } catch (error) {
+      // fetch errors can echo the request URL, which contains the token
+      throw new Error(maskToken((error as Error).message, this.token));
     } finally {
       clearTimeout(timeout);
     }
+  }
+
+  /** Download a file by file_id. Returns the local path. */
+  async downloadFile(fileId: string, destDir: string): Promise<string> {
+    const { fileName, data } = await this.fetchFile(fileId);
+    const destPath = resolve(normalize(join(destDir, fileName)));
+
+    // Security: ensure dest is inside destDir
+    const normalizedDir = resolve(normalize(destDir));
+    if (!destPath.startsWith(normalizedDir + sep) && destPath !== normalizedDir) {
+      throw new Error(`Path traversal blocked: ${destPath} is not inside ${normalizedDir}`);
+    }
+
+    await mkdir(dirname(destPath), { recursive: true });
+    await writeFile(destPath, Buffer.from(data));
+
+    return destPath;
   }
 }
 
