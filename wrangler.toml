@@ -15,6 +15,7 @@ enabled = true
 
 [vars]
 TELEGRAM_DEFAULT_CHAT_ID = "801062947"
+TELEGRAM_META_MODE = "true"
 
 # Temporary file storage for download_file / get_message_file.
 # Create the bucket once:  wrangler r2 bucket create telegram-mcp-files
