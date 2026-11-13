@@ -1,6 +1,6 @@
 ---
 name: telegram-mcp-worker
-description: Send and receive Telegram messages through the telegram-mcp-worker MCP server (the full Bot API as 191 tools on a Cloudflare Worker). Use whenever the task involves Telegram — sending a message, photo, document or poll to a chat, reading a chat or the bot's updates, checking webhook status, or formatting rich Telegram content.
+description: Send and receive Telegram messages through the telegram-mcp-worker MCP server (the full Bot API through 8 tools in meta-mode on a Cloudflare Worker). Use whenever the task involves Telegram — sending a message, photo, document or poll to a chat, reading a chat or the bot's updates, checking webhook status, or formatting rich Telegram content.
 ---
 
 # Telegram via telegram-mcp-worker
@@ -10,9 +10,17 @@ token lives inside the Worker; you never need it, and you must never ask
 the user for it. If a call fails with 401, the client's `MCP_AUTH_TOKEN`
 environment variable is missing or wrong — say that instead.
 
+It runs in meta-mode (8 tools): find a method with `telegram_find`, then
+call it through `telegram_call` with its camelCase Bot API name (e.g.
+`getMe`, `sendMessage`) and a `params` object. The snake_case names in the
+sections below are the pre-meta-mode tool names — the method they map to
+is the camelCase form (`send_message` → `sendMessage`,
+`get_webhook_info` → `getWebhookInfo`).
+
 ## First check
 
-Call `get_me` once per session before other work. It proves the whole
+Call `telegram_call` with `{"method": "getMe"}` once per session before
+other work. It proves the whole
 chain (client → Worker → Telegram) and returns the bot's username and id.
 
 ## Sending
@@ -48,9 +56,12 @@ chain (client → Worker → Telegram) and returns the bot's username and id.
 
 ## Meta-mode
 
-If only two tools are visible (`telegram_find` and `telegram_call`), the
-server is in meta-mode: find the method name with `telegram_find`, check
-its schema, then invoke it through `telegram_call`.
+The server runs in meta-mode: only `telegram_find` and `telegram_call`
+(plus `telegram_format`, `download_file`, `get_message_file` and the TRAIL
+tools) are visible. Find the method name with `telegram_find`, check its
+schema, then invoke it through `telegram_call` — e.g.
+`{"method": "getMe"}` or
+`{"method": "sendMessage", "params": {"chat_id": "...", "text": "..."}}`.
 
 ## Limits to respect
 

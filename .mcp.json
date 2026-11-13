@@ -2,7 +2,7 @@
   "mcpServers": {
     "telegram": {
       "type": "http",
-      "url": "https://telegram-mcp-worker.dawod.workers.dev/mcp",
+      "url": "https://telegram-mcp-worker.engdawood.workers.dev/mcp",
       "headers": {
         "Authorization": "Bearer ${MCP_AUTH_TOKEN}"
       }
