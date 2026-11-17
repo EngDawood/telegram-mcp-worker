@@ -11,9 +11,9 @@
 
 </div>
 
-185/185 Bot API methods with Zod validation, token masking, tool annotations, and zero bloat (2 dependencies) — 191 MCP tools in total, served over stateless Streamable HTTP. The same Worker also receives bot updates through a built-in webhook endpoint, so one deployment covers both sending and receiving.
+185/185 Bot API methods with Zod validation, token masking, tool annotations, and zero bloat (2 dependencies) — served over stateless Streamable HTTP. The same Worker also receives bot updates through a built-in webhook endpoint, so one deployment covers both sending and receiving. The live deployment runs in [meta-mode](#meta-mode): the 191 tools collapse to 8, saving ~99% of the context tokens the tool definitions used to take.
 
-**Live deployment:** `https://telegram-mcp-worker.dawod.workers.dev`
+**Live deployment:** `https://telegram-mcp-worker.engdawood.workers.dev`
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -50,7 +50,7 @@ Point any MCP client at the hosted endpoint:
 {
   "mcpServers": {
     "telegram": {
-      "url": "https://telegram-mcp-worker.dawod.workers.dev/mcp",
+      "url": "https://telegram-mcp-worker.engdawood.workers.dev/mcp",
       "headers": {
         "Authorization": "Bearer <your MCP_AUTH_TOKEN>"
       }
@@ -58,6 +58,29 @@ Point any MCP client at the hosted endpoint:
   }
 }
 ```
+
+## Meta-mode
+
+The live deployment runs in meta-mode (`TELEGRAM_META_MODE=true` in
+`wrangler.toml` under `[vars]`). Instead of one MCP tool per Bot API method
+(191 tools, each carrying its full input schema), the server exposes only 8
+tools — `telegram_find`, `telegram_call`, `telegram_format`,
+`download_file`, `get_message_file` and the TRAIL tools (`get_trail`,
+`mark_trail`, `get_trail_stats`) — which saves ~99% of the context tokens
+the tool definitions used to take. The full Bot API is still available
+through the two meta-tools:
+
+1. `telegram_find` — search methods by keyword, e.g.
+   `{"query": "webhook"}` finds `setWebhook`, `deleteWebhook` and
+   `getWebhookInfo` with their parameters.
+2. `telegram_call` — call a method by its camelCase Bot API name with a
+   `params` object, e.g. `{"method": "getMe"}` or
+   `{"method": "sendMessage", "params": {"chat_id": "...", "text": "..."}}`.
+
+To enable it on your own deployment, set `TELEGRAM_META_MODE` to `"true"`
+as a plain Variable (not a Secret) — in `wrangler.toml` under `[vars]` or in
+the dashboard under Settings → Variables — and redeploy. Remove it (or set
+it to `"false"`) to go back to the standard 191-tool mode.
 
 ## Claude plugin
 
@@ -82,7 +105,7 @@ to your deployment.
 The plugin also ships a skill at
 [`skills/telegram-mcp-worker/SKILL.md`](skills/telegram-mcp-worker/SKILL.md)
 (linked from `.claude/skills/`), which teaches the agent the working rules
-above: verify with `get_me`, ask `telegram_format` before complex payloads,
+above: verify with `telegram_call` (`getMe`), ask `telegram_format` before complex payloads,
 and work within the Worker limits.
 
 ## Deploy your own
@@ -115,26 +138,31 @@ npm run worker:deploy
 
 Optional plain variables (`TELEGRAM_DEFAULT_CHAT_ID`,
 `TELEGRAM_DEFAULT_THREAD_ID`, `TELEGRAM_META_MODE` and the tuning knobs) are
-documented in `src/config.ts`.
+documented in `src/config.ts`; `TELEGRAM_META_MODE` is covered in
+[Meta-mode](#meta-mode) above.
 
 ## Webhook
 
-Register the webhook through the MCP server itself by calling the
-`set_webhook` tool:
+Register the webhook through the MCP server itself by calling `setWebhook`
+through `telegram_call` (in standard mode the same call is the `set_webhook`
+tool):
 
 ```json
 {
-  "url": "https://<your-worker>.workers.dev/webhook",
-  "secret_token": "<same value as the WEBHOOK_SECRET secret>",
-  "allowed_updates": ["message", "edited_message", "channel_post", "edited_channel_post", "callback_query", "inline_query"]
+  "method": "setWebhook",
+  "params": {
+    "url": "https://<your-worker>.workers.dev/webhook",
+    "secret_token": "<same value as the WEBHOOK_SECRET secret>",
+    "allowed_updates": ["message", "edited_message", "channel_post", "edited_channel_post", "callback_query", "inline_query"]
+  }
 }
 ```
 
 Notes:
 
 - While a webhook is registered, Telegram rejects `get_updates` calls.
-  Run the `delete_webhook` tool to go back to polling.
-- `get_webhook_info` shows the registered URL, pending update count and
+  Call `telegram_call` with `deleteWebhook` to go back to polling.
+- `telegram_call` with `getWebhookInfo` shows the registered URL, pending update count and
   the last delivery error, if any.
 - The receiver currently logs updates; it does not reply to messages.
 
@@ -233,7 +261,9 @@ Telegram   ──POST /webhook───────▶ Worker ──▶ update w
   data — name, Bot API endpoint, Zod input schema — and served by one
   generic handler, alongside the `telegram_format` helper, `download_file`,
   `get_message_file` and the TRAIL tools. With `TELEGRAM_META_MODE=true` the registry
-  collapses into two meta-tools (`telegram_find` / `telegram_call`).
+  collapses into two meta-tools (`telegram_find` / `telegram_call`), plus
+  `telegram_format`, `download_file`, `get_message_file` and the TRAIL tools
+  — 8 tools in total on the live deployment.
 - **Telegram client.** A plain `fetch`-based Bot API client
   (`src/telegram/telegram-client.ts`) with global and per-chat rate limiting, a
   circuit breaker and retry with backoff. It also masks the bot token in
@@ -273,10 +303,10 @@ covering the full Telegram Bot API and the stdio build — goes to
 for releasing it under the MIT license, which is preserved in
 [LICENSE](LICENSE). This fork only adds the Cloudflare Worker conversion
 (`src/worker.ts`), the `/webhook` receiver, and the deployment setup used
-to run it at `telegram-mcp-worker.dawod.workers.dev`.
+to run it at `telegram-mcp-worker.engdawood.workers.dev`.
 
 > **This fork (`telegram-mcp-worker`)** converts the server below to a
-> **Cloudflare Worker**: the same 185 Bot API tools served over stateless
+> **Cloudflare Worker**: the full Bot API served over stateless
 > Streamable HTTP at `POST /mcp` (`src/worker.ts`). Based on
 > [timoncool/telegram-api-mcp](https://github.com/timoncool/telegram-api-mcp)
 > @ `34af6ba` (MIT — see LICENSE).
